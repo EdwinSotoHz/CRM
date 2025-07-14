@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - Helen CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos base del dashboard (igual que en las pantallas anteriores) */
+        :root {
+            --azul-oscuro: #1E3A8A;
+            --azul-claro: #3B82F6;
+            --azul-electrico: #2563EB;
+            --rojo: #EF4444;
+            --verde: #10B981;
+            --amarillo: #F59E0B;
+            --texto-oscuro: #1F2937;
+            --texto-claro: #F9FAFB;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --transicion: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+            color: var(--texto-claro);
+            background: transparent;
+        }
+
+        /* Fondo animado mejorado */
+        #techCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        }
+
+        /* Barra Lateral con mejor contraste */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            position: fixed;
+            z-index: 100;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transicion);
+        }
+
+        .sidebar-collapsed {
+            width: 60px;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transicion);
+        }
+
+        .logo-collapsed {
+            padding: 15px;
+        }
+
+        .logo img {
+            max-width: 120px;
+            transition: var(--transicion);
+            filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .logo-collapsed img {
+            max-width: 40px;
+        }
+
+        .menu {
+            padding: 20px 0;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transicion);
+            border-left: 4px solid transparent;
+            margin: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            color: var(--texto-claro);
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid var(--azul-electrico);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-left: 4px solid var(--texto-claro);
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 18px;
+            min-width: 24px;
+            color: var(--texto-claro);
+            transition: var(--transicion);
+        }
+
+        .menu-item span {
+            font-weight: 500;
+            transition: var(--transicion);
+            opacity: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .menu-collapsed span {
+            opacity: 0;
+            width: 0;
+            margin-left: -10px;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transicion);
+            backdrop-filter: blur(5px);
+        }
+
+        .toggle-sidebar:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.05);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            transition: var(--transicion);
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .main-content-collapsed {
+            margin-left: 80px;
+        }
+
+        .topbar {
+            height: 70px;
+            width: calc(100% - 250px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 90;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transicion);
+        }
+
+        .topbar-collapsed {
+            width: calc(100% - 80px);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            width: 300px;
+            transition: var(--transicion);
+            color: white;
+        }
+
+        .search-bar:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            margin-left: 10px;
+            width: 100%;
+            outline: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification {
+            position: relative;
+            margin-right: 20px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--rojo);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-electrico));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Contenido de la Página */
+        .page-content {
+            padding: 100px 30px 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to right, white, #E0E7FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transicion);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--azul-electrico), var(--azul-claro));
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #1D4ED8, #3B82F6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tarjetas con mejor contraste */
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--texto-claro);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Pestañas */
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--azul-claro);
+        }
+
+        /* Tablas más legibles */
+        .table-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+            color: white;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.25);
+            color: #A7F3D0;
+            border: 1px solid rgba(167, 243, 208, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.25);
+            color: #FECACA;
+            border: 1px solid rgba(254, 202, 202, 0.3);
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transicion);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--azul-claro);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Checkboxes para permisos */
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .permission-item input {
+            margin-right: 10px;
+        }
+
+        /* Modal para nueva tarea */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30, 58, 138, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar-collapsed {
+                transform: translateX(0);
+                width: 80px;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .main-content-collapsed {
+                margin-left: 80px;
+            }
+            .topbar {
+                width: 100%;
+            }
+            .topbar-collapsed {
+                width: calc(100% - 80px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .permissions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        }
+
+        #techCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="techCanvas"></canvas>
+
+    <div class="sidebar" id="sidebar">
+        <div class="logo" id="logo">
+            <img src="https://via.placeholder.com/120x40?text=Arkitem+CRM" alt="Helen CRM">
+        </div>
+        <div class="menu">
+            <a href="Dashboard.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+            </a>
+            <a href="Contacts.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Contactos</span>
+                </div>
+            </a>
+            <a href="Gestion.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Ventas</span>
+                </div>
+            </a>
+            <a href="Tasks.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tareas</span>
+                </div>
+            </a>
+            <a href="Cotization.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Cotizaciones</span>
+                </div>
+            </a>
+            <a href="Config.html" style="color: white; text-decoration: none;">
+                <div class="menu-item active">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </div>
+            </a>
+        </div>
+        <button class="toggle-sidebar" id="toggleSidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="topbar" id="topbar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar en configuración...">
+            </div>
+            <div class="user-actions">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">2</div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">JS</div>
+                    <span class="btn" style="border-radius: 40px; background: #1E3A8A; border: 1px solid rgba(0, 89, 255, 0.422);">
+                        <a href="Login.html" style="color: var(--texto); text-decoration: none;">Inicio de sesión</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <div class="page-header">
+                <h1 class="page-title">Configuración del Sistema</h1>
+                <div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab active">Usuarios</div>
+                <div class="tab">Roles y Permisos</div>
+                <div class="tab">Equipos</div>
+                <div class="tab">Catálogos</div>
+                <div class="tab">Integraciones</div>
+            </div>
+
+            <div id="usersTab">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Equipo</th>
+                                    <th>Estado</th>
+                                    <th>Último Acceso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>María González</td>
+                                    <td>maria@arkitem.com</td>
+                                    <td>Administrador</td>
+                                    <td>Ventas</td>
+                                    <td><span class="status-badge status-active">Activo</span></td>
+                                    <td>Hoy, 10:30 AM</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Mendoza</td>
+                                    <td>carlos@arkitem.com</td>
+                                    <td>Vendedor</td>
+                                    <td>Ventas</td>
+                                    <td><span class="status-badge status-active">Activo</span></td>
+                                    <td>Ayer, 3:45 PM</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Laura Ramírez</td>
+                                    <td>laura@arkitem.com</td>
+                                    <td>Supervisor</td>
+                                    <td>Administración</td>
+                                    <td><span class="status-badge status-active">Activo</span></td>
+                                    <td>15 Jul, 9:15 AM</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Juan Pérez</td>
+                                    <td>juan@arkitem.com</td>
+                                    <td>Asistente</td>
+                                    <td>Soporte</td>
+                                    <td><span class="status-badge status-inactive">Inactivo</span></td>
+                                    <td>5 Jul, 11:20 AM</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="newUserBtn">
+                    <i class="fas fa-plus"></i> Nuevo Usuario
+                </button>
+            </div>
+
+            <div id="rolesTab" style="display: none;">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roleName">Nombre del Rol</label>
+                            <input type="text" id="roleName" placeholder="Ej: Vendedor Senior">
+                        </div>
+                        <div class="form-group">
+                            <label for="roleDescription">Descripción</label>
+                            <input type="text" id="roleDescription" placeholder="Descripción del rol">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px; color: white;">Permisos</h4>
+                    <div class="permissions-grid">
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-dashboard" checked>
+                            <label for="perm-dashboard">Ver Dashboard</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-contacts">
+                            <label for="perm-contacts">Gestionar Contactos</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-sales">
+                            <label for="perm-sales">Gestionar Ventas</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-tasks">
+                            <label for="perm-tasks">Gestionar Tareas</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-quotes">
+                            <label for="perm-quotes">Gestionar Cotizaciones</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-reports">
+                            <label for="perm-reports">Generar Reportes</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-settings">
+                            <label for="perm-settings">Configuración del Sistema</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm-admin">
+                            <label for="perm-admin">Acceso Administrativo</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 15px; color: white;">Roles Existentes</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Usuarios</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Administrador</td>
+                                    <td>Acceso completo al sistema</td>
+                                    <td>3</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Vendedor</td>
+                                    <td>Acceso a ventas y contactos</td>
+                                    <td>5</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Supervisor</td>
+                                    <td>Acceso a reportes y supervisión</td>
+                                    <td>2</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Asistente</td>
+                                    <td>Acceso limitado a tareas</td>
+                                    <td>4</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="teamsTab" style="display: none;">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="teamName">Nombre del Equipo</label>
+                            <input type="text" id="teamName" placeholder="Ej: Equipo de Ventas">
+                        </div>
+                        <div class="form-group">
+                            <label for="teamLeader">Líder del Equipo</label>
+                            <select id="teamLeader">
+                                <option value="">Seleccionar líder...</option>
+                                <option value="1">María González</option>
+                                <option value="2">Carlos Mendoza</option>
+                                <option value="3">Laura Ramírez</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teamMembers">Miembros del Equipo</label>
+                        <select id="teamMembers" multiple style="height: 100px;">
+                            <option value="1">María González</option>
+                            <option value="2">Carlos Mendoza</option>
+                            <option value="3">Laura Ramírez</option>
+                            <option value="4">Juan Pérez</option>
+                            <option value="5">Ana López</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teamDescription">Descripción</label>
+                        <textarea id="teamDescription" rows="3" placeholder="Descripción del equipo"></textarea>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 15px; color: white;">Equipos Existentes</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Líder</th>
+                                    <th>Miembros</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ventas</td>
+                                    <td>María González</td>
+                                    <td>5</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Administración</td>
+                                    <td>Laura Ramírez</td>
+                                    <td>3</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Soporte</td>
+                                    <td>Juan Pérez</td>
+                                    <td>4</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="catalogsTab" style="display: none;">
+                <div class="card" style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px; color: white;">Estatus de Ventas</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Orden</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Nuevo</td>
+                                    <td>Lead nuevo sin contacto</td>
+                                    <td>1</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Contactado</td>
+                                    <td>Primer contacto realizado</td>
+                                    <td>2</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Cotizado</td>
+                                    <td>Propuesta enviada</td>
+                                    <td>3</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Negociación</td>
+                                    <td>En proceso de negociación</td>
+                                    <td>4</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Cerrado</td>
+                                    <td>Venta concretada</td>
+                                    <td>5</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Agregar Estatus
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 15px; color: white;">Tipos de Cliente</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Prospecto</td>
+                                    <td>Cliente potencial sin compra</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Cliente</td>
+                                    <td>Cliente con compras realizadas</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>VIP</td>
+                                    <td>Cliente importante con descuentos</td>
+                                    <td>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1); margin-right: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Agregar Tipo
+                    </button>
+                </div>
+            </div>
+
+            <div id="integrationsTab" style="display: none;">
+                <div class="card" style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px; color: white;">Configuración de API</h4>
+                    <div class="form-group">
+                        <label for="apiKey">API Key</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="apiKey" value="a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6" readonly>
+                            <button class="btn btn-secondary" style="padding: 10px;">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="btn btn-secondary" style="padding: 10px;">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="apiDocumentation">Documentación API</label>
+                        <div>
+                            <a href="#" class="btn btn-secondary" style="text-decoration: none;">
+                                <i class="fas fa-book"></i> Ver Documentación
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4 style="margin-bottom: 15px; color: white;">Integraciones Disponibles</h4>
+                    <div class="integrations-list">
+                        <div class="integration-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <div>
+                                <h5 style="margin-bottom: 5px;">Intelisis ERP</h5>
+                                <p style="font-size: 14px; color: rgba(255,255,255,0.7);">Integración con sistema ERP Intelisis</p>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 15px;">
+                                Configurar
+                            </button>
+                        </div>
+                        <div class="integration-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <div>
+                                <h5 style="margin-bottom: 5px;">SAP Business One</h5>
+                                <p style="font-size: 14px; color: rgba(255,255,255,0.7);">Integración con SAP Business One</p>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 15px;">
+                                Configurar
+                            </button>
+                        </div>
+                        <div class="integration-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
+                            <div>
+                                <h5 style="margin-bottom: 5px;">ASPEL</h5>
+                                <p style="font-size: 14px; color: rgba(255,255,255,0.7);">Integración con sistema ASPEL</p>
+                            </div>
+                            <button class="btn btn-primary" style="padding: 8px 15px;">
+                                Configurar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nuevo Usuario</h3>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="userForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userName">Nombre Completo</label>
+                        <input type="text" id="userName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Correo Electrónico</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userRole">Rol</label>
+                        <select id="userRole" required>
+                            <option value="">Seleccionar rol...</option>
+                            <option value="admin">Administrador</option>
+                            <option value="seller">Vendedor</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="assistant">Asistente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="userTeam">Equipo</label>
+                        <select id="userTeam">
+                            <option value="">Seleccionar equipo...</option>
+                            <option value="sales">Ventas</option>
+                            <option value="admin">Administración</option>
+                            <option value="support">Soporte</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userPassword">Contraseña</label>
+                        <input type="password" id="userPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userConfirmPassword">Confirmar Contraseña</label>
+                        <input type="password" id="userConfirmPassword" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userStatus">Estado</label>
+                    <select id="userStatus">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelUser">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fondo animado (mismo que en el dashboard)
+        const canvas = document.getElementById('techCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            createNodes();
+        });
+
+        const nodes = [];
+        const nodeCount = 120;
+        const maxDistance = 200;
+
+        function createNodes() {
+            nodes.length = 0;
+            for (let i = 0; i < nodeCount; i++) {
+                nodes.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 1,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
+        }
+
+        function drawCircuit() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < nodes.length; i++) {
+                const nodeA = nodes[i];
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const nodeB = nodes[j];
+                    const dx = nodeB.x - nodeA.x;
+                    const dy = nodeB.y - nodeA.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDistance) {
+                        const opacity = 1 - dist / maxDistance;
+                        ctx.strokeStyle = `rgba(59, 205, 246, ${opacity * 0.3})`;
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(nodeA.x, nodeA.y);
+                        ctx.lineTo(nodeB.x, nodeB.y);
+                        ctx.stroke();
+                    }
+                }
+
+                nodeA.x += nodeA.vx;
+                nodeA.y += nodeA.vy;
+
+                if (nodeA.x <= 0 || nodeA.x >= width) nodeA.vx *= -1;
+                if (nodeA.y <= 0 || nodeA.y >= height) nodeA.vy *= -1;
+
+                const gradient = ctx.createRadialGradient(
+                    nodeA.x, nodeA.y, 0,
+                    nodeA.x, nodeA.y, nodeA.radius * 3
+                );
+                gradient.addColorStop(0, 'rgba(59, 205, 246, 0.6)');
+                gradient.addColorStop(1, 'rgba(59, 205, 246, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius * 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(59, 205, 246, 0.9)';
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            requestAnimationFrame(drawCircuit);
+        }
+
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topbar = document.getElementById('topbar');
+        const logo = document.getElementById('logo');
+        const menuItems = document.querySelectorAll('.menu-item span');
+        const menuIcons = document.querySelectorAll('.menu-item i');
+
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-collapsed');
+            topbar.classList.toggle('topbar-collapsed');
+            logo.classList.toggle('logo-collapsed');
+            
+            menuItems.forEach(el => {
+                el.classList.toggle('menu-collapsed');
+            });
+            
+            menuIcons.forEach(icon => {
+                if (sidebar.classList.contains('sidebar-collapsed')) {
+                    icon.style.marginRight = '0';
+                } else {
+                    icon.style.marginRight = '12px';
+                }
+            });
+
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                toggleSidebar.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                toggleSidebar.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        });
+
+        const tabs = document.querySelectorAll('.tab');
+        const usersTab = document.getElementById('usersTab');
+        const rolesTab = document.getElementById('rolesTab');
+        const teamsTab = document.getElementById('teamsTab');
+        const catalogsTab = document.getElementById('catalogsTab');
+        const integrationsTab = document.getElementById('integrationsTab');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                if (tab.textContent === 'Usuarios') {
+                    usersTab.style.display = 'block';
+                    rolesTab.style.display = 'none';
+                    teamsTab.style.display = 'none';
+                    catalogsTab.style.display = 'none';
+                    integrationsTab.style.display = 'none';
+                } else if (tab.textContent === 'Roles y Permisos') {
+                    usersTab.style.display = 'none';
+                    rolesTab.style.display = 'block';
+                    teamsTab.style.display = 'none';
+                    catalogsTab.style.display = 'none';
+                    integrationsTab.style.display = 'none';
+                } else if (tab.textContent === 'Equipos') {
+                    usersTab.style.display = 'none';
+                    rolesTab.style.display = 'none';
+                    teamsTab.style.display = 'block';
+                    catalogsTab.style.display = 'none';
+                    integrationsTab.style.display = 'none';
+                } else if (tab.textContent === 'Catálogos') {
+                    usersTab.style.display = 'none';
+                    rolesTab.style.display = 'none';
+                    teamsTab.style.display = 'none';
+                    catalogsTab.style.display = 'block';
+                    integrationsTab.style.display = 'none';
+                } else if (tab.textContent === 'Integraciones') {
+                    usersTab.style.display = 'none';
+                    rolesTab.style.display = 'none';
+                    teamsTab.style.display = 'none';
+                    catalogsTab.style.display = 'none';
+                    integrationsTab.style.display = 'block';
+                }
+            });
+        });
+
+        const modal = document.getElementById('userModal');
+        const newUserBtn = document.getElementById('newUserBtn');
+        const closeModal = document.getElementById('closeModal');
+        const cancelUser = document.getElementById('cancelUser');
+        const userForm = document.getElementById('userForm');
+
+        newUserBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        cancelUser.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Usuario creado exitosamente');
+            modal.classList.remove('active');
+            userForm.reset();
+        });
+
+        createNodes();
+        drawCircuit();
+    </script>
+</body>
+</html>

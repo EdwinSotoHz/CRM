@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactos - Helen CRM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos del dashboard (los mismos que en el archivo original) */
+        :root {
+            --azul-oscuro: #1E3A8A;
+            --azul-claro: #3B82F6;
+            --azul-electrico: #2563EB;
+            --rojo: #EF4444;
+            --verde: #10B981;
+            --amarillo: #F59E0B;
+            --texto-oscuro: #1F2937;
+            --texto-claro: #F9FAFB;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --transicion: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+            color: var(--texto-claro);
+            background: transparent;
+        }
+
+        /* Fondo animado mejorado */
+        #techCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        }
+
+        /* Barra Lateral con mejor contraste */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            position: fixed;
+            z-index: 100;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transicion);
+        }
+
+        .sidebar-collapsed {
+            width: 60px;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transicion);
+        }
+
+        .logo-collapsed {
+            padding: 15px;
+        }
+
+        .logo img {
+            max-width: 120px;
+            transition: var(--transicion);
+            filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .logo-collapsed img {
+            max-width: 40px;
+        }
+
+        .menu {
+            padding: 20px 0;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transicion);
+            border-left: 4px solid transparent;
+            margin: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            color: var(--texto-claro);
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid var(--azul-electrico);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-left: 4px solid var(--texto-claro);
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 18px;
+            min-width: 24px;
+            color: var(--texto-claro);
+            transition: var(--transicion);
+        }
+
+        .menu-item span {
+            font-weight: 500;
+            transition: var(--transicion);
+            opacity: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .menu-collapsed span {
+            opacity: 0;
+            width: 0;
+            margin-left: -10px;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: var(--transicion);
+            backdrop-filter: blur(5px);
+        }
+
+        .toggle-sidebar:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.05);
+        }
+
+        /* Contenido Principal con mejor legibilidad */
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            transition: var(--transicion);
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .main-content-collapsed {
+            margin-left: 80px;
+        }
+
+        /* Barra Superior mejorada */
+        .topbar {
+            height: 70px;
+            width: calc(100% - 250px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 90;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transicion);
+        }
+
+        .topbar-collapsed {
+            width: calc(100% - 80px);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            width: 300px;
+            transition: var(--transicion);
+            color: white;
+        }
+
+        .search-bar:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            margin-left: 10px;
+            width: 100%;
+            outline: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification {
+            position: relative;
+            margin-right: 20px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--rojo);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-electrico));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Contenido de la Página */
+        .page-content {
+            padding: 100px 30px 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to right, white, #E0E7FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transicion);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--azul-electrico), var(--azul-claro));
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #1D4ED8, #3B82F6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Tarjetas con mejor contraste */
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--texto-claro);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Tablas más legibles */
+        .table-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            box-shadow: var(--sombra);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
+            color: white;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.25);
+            color: #A7F3D0;
+            border: 1px solid rgba(167, 243, 208, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.25);
+            color: #FEF3C7;
+            border: 1px solid rgba(254, 243, 199, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.25);
+            color: #FECACA;
+            border: 1px solid rgba(254, 202, 202, 0.3);
+        }
+
+        /* Filtros */
+        .filters-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 15px;
+        }
+
+        .filter-group label {
+            margin-right: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .filter-group select, 
+        .filter-group input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .filter-group select option {
+            background: #1E3A8A;
+        }
+
+        /* Pestañas */
+        .tabs-container {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .tab.active {
+            color: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--azul-claro);
+        }
+
+        /* Detalles de contacto */
+        .contact-details {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 0;
+            width: 400px;
+            height: calc(100vh - 70px);
+            background: rgba(30, 58, 138, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 95;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-details.active {
+            display: block;
+        }
+
+        .contact-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-electrico));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .contact-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .contact-company {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .contact-info-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            width: 100px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .info-value {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .close-details {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Kanban para oportunidades */
+        .kanban-board {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .kanban-column {
+            min-width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .column-title {
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .column-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+
+        .kanban-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--sombra);
+            cursor: grab;
+            transition: var(--transicion);
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar-collapsed {
+                transform: translateX(0);
+                width: 80px;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .main-content-collapsed {
+                margin-left: 80px;
+            }
+            .topbar {
+                width: 100%;
+            }
+            .topbar-collapsed {
+                width: calc(100% - 80px);
+            }
+            .contact-details {
+                width: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .contact-details {
+                width: 100%;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        }
+
+        #techCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="techCanvas"></canvas>
+
+    <div class="sidebar" id="sidebar">
+        <div class="logo" id="logo">
+            <img src="https://via.placeholder.com/120x40?text=Arkitem+CRM" alt="Helen CRM">
+        </div>
+        <div class="menu">
+            <a href="Dashboard.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+            </a>
+            <a href="Contacts.html" style="color: white; text-decoration: none;">
+                <div class="menu-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Contactos</span>
+                </div>
+            </a>
+            <a href="Gestion.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Ventas</span>
+                </div>
+            </a>
+            <a href="Tasks.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tareas</span>
+                </div>
+            </a>
+            <a href="Config.html" style="color: white; text-decoration: none;">
+                <div class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </div>
+            </a>
+        </div>
+        <button class="toggle-sidebar" id="toggleSidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="topbar" id="topbar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar contactos...">
+            </div>
+            <div class="user-actions">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <div class="notification-badge">3</div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">JS</div>
+                    <span class="btn" style="border-radius: 40px; background: #1E3A8A; border: 1px solid rgba(0, 89, 255, 0.422);">
+                        <a href="Login.html" style="color: var(--texto); text-decoration: none;">Inicio de sesión</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <div class="page-header">
+                <h1 class="page-title">Contactos</h1>
+                <div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Contacto
+                    </button>
+                    <button class="btn btn-primary" style="margin-left: 10px;">
+                        <i class="fas fa-file-import"></i> Importar
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tab active">Todos los contactos</div>
+                <div class="tab">Clientes</div>
+                <div class="tab">Prospectos</div>
+                <div class="tab">Empresas</div>
+            </div>
+
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filter-status"><i class="fas fa-filter"></i></label>
+                    <select id="filter-status">
+                        <option value="">Todos los estados</option>
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                        <option value="pending">Pendiente</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-industry"><i class="fas fa-industry"></i></label>
+                    <select id="filter-industry">
+                        <option value="">Todas las industrias</option>
+                        <option value="tech">Tecnología</option>
+                        <option value="finance">Finanzas</option>
+                        <option value="health">Salud</option>
+                        <option value="education">Educación</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-tag"><i class="fas fa-tag"></i></label>
+                    <select id="filter-tag">
+                        <option value="">Todas las etiquetas</option>
+                        <option value="hot">Caliente</option>
+                        <option value="cold">Frío</option>
+                        <option value="lead">Lead</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-assigned"><i class="fas fa-user"></i></label>
+                    <select id="filter-assigned">
+                        <option value="">Todos los responsables</option>
+                        <option value="user1">María González</option>
+                        <option value="user2">Carlos Mendoza</option>
+                        <option value="user3">Laura Ramírez</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Empresa</th>
+                                <th>Cargo</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Estado</th>
+                                <th>Oportunidades</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>María González</td>
+                                <td>TecnoSol</td>
+                                <td>Directora de TI</td>
+                                <td>+52 55 1234 5678</td>
+                                <td>maria.gonzalez@tecnosol.com</td>
+                                <td><span class="status-badge status-active">Activo</span></td>
+                                <td>3</td>
+                                <td>
+                                    <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Carlos Mendoza</td>
+                                <td>InnovaTech</td>
+                                <td>Gerente Comercial</td>
+                                <td>+52 55 8765 4321</td>
+                                <td>carlos.mendoza@innova.tech</td>
+                                <td><span class="status-badge status-active">Activo</span></td>
+                                <td>2</td>
+                                <td>
+                                    <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Laura Ramírez</td>
+                                <td>DigitalMind</td>
+                                <td>CEO</td>
+                                <td>+52 55 5678 1234</td>
+                                <td>laura.ramirez@digitalmind.mx</td>
+                                <td><span class="status-badge status-pending">Pendiente</span></td>
+                                <td>1</td>
+                                <td>
+                                    <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Juan Pérez</td>
+                                <td>Grupo AXA</td>
+                                <td>Director Financiero</td>
+                                <td>+52 55 4321 8765</td>
+                                <td>juan.perez@grupoaxa.com</td>
+                                <td><span class="status-badge status-inactive">Inactivo</span></td>
+                                <td>0</td>
+                                <td>
+                                    <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ana López</td>
+                                <td>FinanTech</td>
+                                <td>Directora de Marketing</td>
+                                <td>+52 55 1122 3344</td>
+                                <td>ana.lopez@finantech.com</td>
+                                <td><span class="status-badge status-active">Activo</span></td>
+                                <td>2</td>
+                                <td>
+                                    <button class="btn" style="padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">Oportunidades</h3>
+            <div class="kanban-board">
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <h4 class="column-title">Nuevo</h4>
+                        <span class="column-count">1</span>
+                    </div>
+                    <div class="kanban-card">
+                        <h5 class="card-title">Proyecto Web TecnoSol</h5>
+                        <div class="card-meta">
+                            <span>$5,200</span>
+                            <span>Asignado: María G.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <h4 class="column-title">Contactado</h4>
+                        <span class="column-count">1</span>
+                    </div>
+                    <div class="kanban-card">
+                        <h5 class="card-title">Migración Cloud InnovaTech</h5>
+                        <div class="card-meta">
+                            <span>$12,000</span>
+                            <span>Asignado: Carlos M.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <h4 class="column-title">Negociación</h4>
+                        <span class="column-count">1</span>
+                    </div>
+                    <div class="kanban-card">
+                        <h5 class="card-title">CRM Empresarial Grupo AXA</h5>
+                        <div class="card-meta">
+                            <span>$24,500</span>
+                            <span>Asignado: María G.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <h4 class="column-title">Cerrado</h4>
+                        <span class="column-count">1</span>
+                    </div>
+                    <div class="kanban-card">
+                        <h5 class="card-title">App Móvil Financiera</h5>
+                        <div class="card-meta">
+                            <span>$18,300</span>
+                            <span>Asignado: Juan P.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-details" id="contactDetails">
+        <button class="close-details" id="closeDetails">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="contact-header">
+            <div class="contact-avatar">MG</div>
+            <div>
+                <div class="contact-name">María González</div>
+                <div class="contact-company">TecnoSol - Directora de TI</div>
+            </div>
+        </div>
+
+        <div class="contact-info-section">
+            <div class="section-title">
+                <span>Información de contacto</span>
+                <button class="btn" style="padding: 3px 8px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Teléfono</div>
+                <div class="info-value">+52 55 1234 5678</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Email</div>
+                <div class="info-value">maria.gonzalez@tecnosol.com</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Dirección</div>
+                <div class="info-value">Av. Insurgentes Sur 1234, CDMX</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Redes</div>
+                <div class="info-value">
+                    <a href="#" style="color: var(--azul-claro); margin-right: 10px;"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" style="color: var(--azul-claro);"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-info-section">
+            <div class="section-title">
+                <span>Información de la empresa</span>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Empresa</div>
+                <div class="info-value">TecnoSol</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Industria</div>
+                <div class="info-value">Tecnología</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Tamaño</div>
+                <div class="info-value">100-500 empleados</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Ingresos</div>
+                <div class="info-value">$50M - $100M</div>
+            </div>
+        </div>
+
+        <div class="contact-info-section">
+            <div class="section-title">
+                <span>Historial de interacciones</span>
+                <button class="btn" style="padding: 3px 8px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </div>
+            <div class="activities-list">
+                <div class="activity-item">
+                    <div class="activity-avatar">CM</div>
+                    <div class="activity-content">
+                        <div>Llamada de seguimiento</div>
+                        <div class="activity-meta">
+                            <span>Hoy, 10:30 AM</span>
+                            <span>15 min</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-avatar">MG</div>
+                    <div class="activity-content">
+                        <div>Reunión virtual demostración producto</div>
+                        <div class="activity-meta">
+                            <span>12 Jul, 3:00 PM</span>
+                            <span>30 min</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-avatar">LR</div>
+                    <div class="activity-content">
+                        <div>Email con propuesta comercial</div>
+                        <div class="activity-meta">
+                            <span>5 Jul, 11:20 AM</span>
+                            <span>$12,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-info-section">
+            <div class="section-title">
+                <span>Notas</span>
+                <button class="btn" style="padding: 3px 8px; font-size: 12px; background: rgba(255,255,255,0.1);">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </div>
+            <div class="card" style="margin-top: 10px; padding: 15px; background: rgba(255,255,255,0.1);">
+                <div style="font-size: 14px; margin-bottom: 10px;">
+                    María mostró interés especial en nuestra solución de CRM empresarial. Seguir con demostración técnica la próxima semana.
+                </div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.7); text-align: right;">
+                    - Carlos Mendoza, 10 Jul 2023
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('techCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            createNodes();
+        });
+
+        const nodes = [];
+        const nodeCount = 120;
+        const maxDistance = 200;
+
+        function createNodes() {
+            nodes.length = 0;
+            for (let i = 0; i < nodeCount; i++) {
+                nodes.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 1,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
+        }
+
+        function drawCircuit() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < nodes.length; i++) {
+                const nodeA = nodes[i];
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const nodeB = nodes[j];
+                    const dx = nodeB.x - nodeA.x;
+                    const dy = nodeB.y - nodeA.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDistance) {
+                        const opacity = 1 - dist / maxDistance;
+                        ctx.strokeStyle = `rgba(59, 205, 246, ${opacity * 0.3})`;
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(nodeA.x, nodeA.y);
+                        ctx.lineTo(nodeB.x, nodeB.y);
+                        ctx.stroke();
+                    }
+                }
+
+                nodeA.x += nodeA.vx;
+                nodeA.y += nodeA.vy;
+
+                if (nodeA.x <= 0 || nodeA.x >= width) nodeA.vx *= -1;
+                if (nodeA.y <= 0 || nodeA.y >= height) nodeA.vy *= -1;
+
+                const gradient = ctx.createRadialGradient(
+                    nodeA.x, nodeA.y, 0,
+                    nodeA.x, nodeA.y, nodeA.radius * 3
+                );
+                gradient.addColorStop(0, 'rgba(59, 205, 246, 0.6)');
+                gradient.addColorStop(1, 'rgba(59, 205, 246, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius * 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(59, 205, 246, 0.9)';
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            requestAnimationFrame(drawCircuit);
+        }
+
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topbar = document.getElementById('topbar');
+        const logo = document.getElementById('logo');
+        const menuItems = document.querySelectorAll('.menu-item span');
+        const menuIcons = document.querySelectorAll('.menu-item i');
+
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-collapsed');
+            topbar.classList.toggle('topbar-collapsed');
+            logo.classList.toggle('logo-collapsed');
+            
+            menuItems.forEach(el => {
+                el.classList.toggle('menu-collapsed');
+            });
+            
+            menuIcons.forEach(icon => {
+                if (sidebar.classList.contains('sidebar-collapsed')) {
+                    icon.style.marginRight = '0';
+                } else {
+                    icon.style.marginRight = '12px';
+                }
+            });
+
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                toggleSidebar.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                toggleSidebar.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        });
+
+        const viewButtons = document.querySelectorAll('table tbody tr td button');
+        const contactDetails = document.getElementById('contactDetails');
+        const closeDetails = document.getElementById('closeDetails');
+
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                contactDetails.classList.add('active');
+            });
+        });
+
+        closeDetails.addEventListener('click', () => {
+            contactDetails.classList.remove('active');
+        });
+
+        const kanbanCards = document.querySelectorAll('.kanban-card');
+        const kanbanColumns = document.querySelectorAll('.kanban-column');
+
+        kanbanCards.forEach(card => {
+            card.setAttribute('draggable', 'true');
+            
+            card.addEventListener('dragstart', () => {
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+            });
+        });
+
+        kanbanColumns.forEach(column => {
+            column.addEventListener('dragover', e => {
+                e.preventDefault();
+                const draggingCard = document.querySelector('.dragging');
+                column.appendChild(draggingCard);
+                
+                updateColumnCounts();
+            });
+        });
+
+        function updateColumnCounts() {
+            document.querySelectorAll('.kanban-column').forEach(column => {
+                const count = column.querySelectorAll('.kanban-card').length;
+                column.querySelector('.column-count').textContent = count;
+            });
+        }
+
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        createNodes();
+        drawCircuit();
+    </script>
+</body>
+</html>

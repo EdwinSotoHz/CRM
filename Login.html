@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helen CRM - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --azul-oscuro: #1E3A8A;
+            --azul-claro: #3B82F6;
+            --azul-electrico: #2563EB;
+            --rojo: #EF4444;
+            --verde: #10B981;
+            --amarillo: #F59E0B;
+            --texto-oscuro: #1F2937;
+            --texto-claro: #F9FAFB;
+            --sombra: 0 4px 20px rgba(0, 0, 0, 0.15);
+            --transicion: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+            color: var(--texto-claro);
+            background: transparent;
+        }
+
+        /* Fondo animado */
+        #techCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        }
+
+        /* Contenedor principal del login */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Tarjeta de login */
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--sombra);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transicion);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Logo */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            max-width: 180px;
+            filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* Títulos */
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to right, white, #E0E7FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Formulario */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            transition: var(--transicion);
+            backdrop-filter: blur(5px);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--azul-claro);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Botones */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: var(--transicion);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--azul-electrico), var(--azul-claro));
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #1D4ED8, #3B82F6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Enlaces */
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .login-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transicion);
+        }
+
+        .login-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Switch a registro */
+        .auth-switch {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-switch a {
+            color: var(--azul-claro);
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 5px;
+            transition: var(--transicion);
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+            
+            .login-links {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        }
+
+        #techCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="techCanvas"></canvas>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="https://via.placeholder.com/180x60?text=Arkitem+CRM" alt="Helen CRM">
+            </div>
+            
+            <h1 class="login-title">Iniciar Sesión</h1>
+            
+            <form>
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" class="form-control" placeholder="tu@email.com">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••">
+                    </div>
+                </div>
+                
+                <div class="form-group form-check">
+                    <input type="checkbox" id="remember" class="form-check-input">
+                    <label for="remember" class="form-check-label">Recordar mi sesión</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Ingresar</button>
+                
+                <div class="login-links">
+                    <a href="#" class="login-link">¿Olvidaste tu contraseña?</a>
+                    <a href="CRMSignup.html" class="login-link">Crear una cuenta</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('techCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const nodes = [];
+        const nodeCount = 100;
+        const maxDistance = 200;
+
+        function createNodes() {
+            for (let i = 0; i < nodeCount; i++) {
+                nodes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 1,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4
+                });
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < nodes.length; i++) {
+                const nodeA = nodes[i];
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const nodeB = nodes[j];
+                    const dx = nodeB.x - nodeA.x;
+                    const dy = nodeB.y - nodeA.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDistance) {
+                        const opacity = 1 - dist / maxDistance;
+                        ctx.strokeStyle = `rgba(59, 205, 246, ${opacity * 0.3})`;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(nodeA.x, nodeA.y);
+                        ctx.lineTo(nodeB.x, nodeB.y);
+                        ctx.stroke();
+                    }
+                }
+
+                nodeA.x += nodeA.vx;
+                nodeA.y += nodeA.vy;
+
+                if (nodeA.x <= 0 || nodeA.x >= canvas.width) nodeA.vx *= -1;
+                if (nodeA.y <= 0 || nodeA.y >= canvas.height) nodeA.vy *= -1;
+
+                const gradient = ctx.createRadialGradient(
+                    nodeA.x, nodeA.y, 0,
+                    nodeA.x, nodeA.y, nodeA.radius * 3
+                );
+                gradient.addColorStop(0, 'rgba(59, 205, 246, 0.6)');
+                gradient.addColorStop(1, 'rgba(59, 205, 246, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius * 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(59, 205, 246, 0.9)';
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        createNodes();
+        animate();
+    </script>
+</body>
+</html>
